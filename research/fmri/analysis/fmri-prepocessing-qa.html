@@ -2347,20 +2347,20 @@
   ```bash
   #!/bin/bash</p>
 <h1 id="_1">==============================================================================<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<h1 id="fix-empty-pial-files-in-freesurfer-directories">Fix Empty Pial Files in FreeSurfer Directories<a class="headerlink" href="#fix-empty-pial-files-in-freesurfer-directories" title="Permanent link">&para;</a></h1>
+<h1 id="fix-broken-files-in-freesurfer-directories">Fix Broken Files in FreeSurfer Directories<a class="headerlink" href="#fix-broken-files-in-freesurfer-directories" title="Permanent link">&para;</a></h1>
 <h1 id="_2"><a class="headerlink" href="#_2" title="Permanent link">&para;</a></h1>
-<h1 id="this-script-checks-if-the-lhpial-and-rhpial-files-are-empty-0-kb-in-a">This script checks if the lh.pial and rh.pial files are empty (0 KB) in a<a class="headerlink" href="#this-script-checks-if-the-lhpial-and-rhpial-files-are-empty-0-kb-in-a" title="Permanent link">&para;</a></h1>
-<h1 id="freesurfer-directory-if-an-empty-file-is-found-it-creates-a-symbolic-link">FreeSurfer directory. If an empty file is found, it creates a symbolic link<a class="headerlink" href="#freesurfer-directory-if-an-empty-file-is-found-it-creates-a-symbolic-link" title="Permanent link">&para;</a></h1>
-<h1 id="to-the-corresponding-lhpialt1-or-rhpialt1-file">to the corresponding lh.pial.T1 or rh.pial.T1 file.<a class="headerlink" href="#to-the-corresponding-lhpialt1-or-rhpialt1-file" title="Permanent link">&para;</a></h1>
+<h1 id="this-script-checks-for-specific-broken-or-empty-files-in-a-freesurfer-directory">This script checks for specific broken or empty files in a FreeSurfer directory.<a class="headerlink" href="#this-script-checks-for-specific-broken-or-empty-files-in-a-freesurfer-directory" title="Permanent link">&para;</a></h1>
+<h1 id="if-a-broken-file-is-found-it-creates-a-symbolic-link-to-its-corresponding">If a broken file is found, it creates a symbolic link to its corresponding<a class="headerlink" href="#if-a-broken-file-is-found-it-creates-a-symbolic-link-to-its-corresponding" title="Permanent link">&para;</a></h1>
+<h1 id="original-file">original file.<a class="headerlink" href="#original-file" title="Permanent link">&para;</a></h1>
 <h1 id="_3"><a class="headerlink" href="#_3" title="Permanent link">&para;</a></h1>
 <h1 id="usage">Usage:<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h1>
-<h1 id="fix_pial_linkssh-process-all-subjects-in-freesurfer_path">./fix_pial_links.sh         # Process all subjects in $FREESURFER_PATH<a class="headerlink" href="#fix_pial_linkssh-process-all-subjects-in-freesurfer_path" title="Permanent link">&para;</a></h1>
-<h1 id="fix_pial_linkssh-sub-01-process-only-the-given-subjects">./fix_pial_links.sh sub-01  # Process only the given subject(s)<a class="headerlink" href="#fix_pial_linkssh-sub-01-process-only-the-given-subjects" title="Permanent link">&para;</a></h1>
+<h1 id="fix_freesurfer_linkssh-process-all-subjects-in-freesurfer_path">./fix_freesurfer_links.sh         # Process all subjects in $FREESURFER_PATH<a class="headerlink" href="#fix_freesurfer_linkssh-process-all-subjects-in-freesurfer_path" title="Permanent link">&para;</a></h1>
+<h1 id="fix_freesurfer_linkssh-sub-01-process-only-the-given-subjects">./fix_freesurfer_links.sh sub-01  # Process only the given subject(s)<a class="headerlink" href="#fix_freesurfer_linkssh-sub-01-process-only-the-given-subjects" title="Permanent link">&para;</a></h1>
 <h1 id="_4"><a class="headerlink" href="#_4" title="Permanent link">&para;</a></h1>
 <h1 id="requirements">Requirements:<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h1>
 <h1 id="-the-environment-variable-freesurfer_path-must-be-set-and-point-to-the">- The environment variable $FREESURFER_PATH must be set and point to the<a class="headerlink" href="#-the-environment-variable-freesurfer_path-must-be-set-and-point-to-the" title="Permanent link">&para;</a></h1>
 <h1 id="directory-containing-the-subject-folders">directory containing the subject folders.<a class="headerlink" href="#directory-containing-the-subject-folders" title="Permanent link">&para;</a></h1>
-<h1 id="-freesurfer-outputs-eg-lhpialt1-must-exist-for-the-fix-to-work">- FreeSurfer outputs (e.g., lh.pial.T1) must exist for the fix to work.<a class="headerlink" href="#-freesurfer-outputs-eg-lhpialt1-must-exist-for-the-fix-to-work" title="Permanent link">&para;</a></h1>
+<h1 id="-freesurfer-outputs-must-exist-for-the-fix-to-work">- FreeSurfer outputs must exist for the fix to work.<a class="headerlink" href="#-freesurfer-outputs-must-exist-for-the-fix-to-work" title="Permanent link">&para;</a></h1>
 <h1 id="_5">==============================================================================<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h1>
 <h1 id="check-if-freesurfer_path-is-set">Check if FREESURFER_PATH is set<a class="headerlink" href="#check-if-freesurfer_path-is-set" title="Permanent link">&para;</a></h1>
 <p>if [[ -z "$FREESURFER_PATH" ]]; then
@@ -2376,6 +2376,17 @@ else
 else
     SUBJS=("</script></span>@")  # Use provided subjects
 fi</p>
+<h1 id="define-file-mappings-broken-file-target-file">Define file mappings: (broken file → target file)<a class="headerlink" href="#define-file-mappings-broken-file-target-file" title="Permanent link">&para;</a></h1>
+<p>declare -A FILE_MAP=(
+    ["lh.fsaverage.sphere.reg"]="lh.sphere.reg"
+    ["rh.fsaverage.sphere.reg"]="rh.sphere.reg"
+    ["lh.pial"]="lh.pial.T1"
+    ["rh.pial"]="rh.pial.T1"
+    ["lh.white.K"]="lh.white.preaparc.K"
+    ["rh.white.K"]="rh.white.preaparc.K"
+    ["lh.white.H"]="lh.white.preaparc.H"
+    ["rh.white.H"]="rh.white.preaparc.H"
+)</p>
 <h1 id="loop-over-subjects">Loop over subjects<a class="headerlink" href="#loop-over-subjects" title="Permanent link">&para;</a></h1>
 <p>for SUBJ in "<span FREESURFER_PATH="FREESURFER_PATH" class="arithmatex"><span class="MathJax_Preview">{SUBJS[@]}"; do
     SURF_PATH="</span><script type="math/tex">{SUBJS[@]}"; do
@@ -2386,30 +2397,31 @@ if [[ ! -d &quot;$SURF_PATH&quot; ]]; then
     continue
 fi
 
-# Process both hemispheres (left: lh, right: rh)
-for HEMI in lh rh; do
-    PIAL=&quot;${SURF_PATH}/${HEMI}.pial&quot;
-    PIAL_T1=&quot;${SURF_PATH}/${HEMI}.pial.T1&quot;
+# Loop over each broken file type
+for BROKEN_FILE in &quot;${!FILE_MAP[@]}&quot;; do
+    TARGET_FILE=&quot;${FILE_MAP[$BROKEN_FILE]}&quot;
+    BROKEN_PATH=&quot;${SURF_PATH}/${BROKEN_FILE}&quot;
+    TARGET_PATH=&quot;${SURF_PATH}/${TARGET_FILE}&quot;
 
-    # Check if the pial file exists and is 0 KB
-    if [[ -e &quot;$PIAL&quot; &amp;&amp; ! -s &quot;$PIAL&quot; ]]; then
-        echo &quot;🛠 Fixing empty ${HEMI}.pial for $SUBJ...&quot;
+    # Check if the broken file exists and is empty
+    if [[ -e &quot;$BROKEN_PATH&quot; &amp;&amp; ! -s &quot;$BROKEN_PATH&quot; ]]; then
+        echo &quot;🛠 Fixing $BROKEN_FILE for $SUBJ...&quot;
 
-        # Check if the corresponding .T1 file exists before creating the link
-        if [[ -e &quot;$PIAL_T1&quot; ]]; then
-            ln -sf &quot;$PIAL_T1&quot; &quot;$PIAL&quot;
-            echo &quot;✔ Created symbolic link: ${HEMI}.pial → ${HEMI}.pial.T1&quot;
+        # Check if the corresponding target file exists before creating the link
+        if [[ -e &quot;$TARGET_PATH&quot; ]]; then
+            ln -sf &quot;$TARGET_PATH&quot; &quot;$BROKEN_PATH&quot;
+            echo &quot;✔ Created symbolic link: $BROKEN_FILE → $TARGET_FILE&quot;
         else
-            echo &quot;⚠️ Warning: ${HEMI}.pial.T1 not found for $SUBJ. Cannot create link.&quot;
+            echo &quot;⚠️ Warning: $TARGET_FILE not found for $SUBJ. Cannot create link.&quot;
         fi
     else
-        echo &quot;✅ ${HEMI}.pial for $SUBJ is fine. No action needed.&quot;
+        echo &quot;✅ $BROKEN_FILE for $SUBJ is fine. No action needed.&quot;
     fi
 done
 </code></pre></div>
 <p>done</p>
-<p>echo "✅ Done."
-  ```</p>
+<p>echo "✅ Done."</p>
+<p>```</p>
 </details>
 <hr />
 <p>With these quality checks complete, you’re ready to proceed to the <strong>General Linear Model (GLM) analysis</strong>. See the next guide for instructions on setting up your GLM. <a href="fmri-glm.html">&rarr; Go to GLM</a></p>
@@ -2433,7 +2445,7 @@ done
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime">March 3, 2025 10:34:59</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime">March 4, 2025 10:21:48</span>
   </span>
 
     
